@@ -2,7 +2,6 @@ package com.back.global.initData
 
 import com.back.domain.member.member.service.MemberService
 import com.back.domain.post.post.service.PostService
-import lombok.RequiredArgsConstructor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
@@ -12,47 +11,49 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.transaction.annotation.Transactional
 
 @Configuration
-@RequiredArgsConstructor
-class BaseInitData {
+class BaseInitData(
     @Autowired
     @Lazy
-    private val self: BaseInitData? = null
-    private val postService: PostService? = null
-    private val memberService: MemberService? = null
+    private val self: BaseInitData,
+    private val postService: PostService,
+    private val memberService: MemberService
+) {
+
 
     @Bean
     fun initDataRunner(): ApplicationRunner {
-        return ApplicationRunner { args: ApplicationArguments? ->
-            self!!.work1()
+        return ApplicationRunner { args: ApplicationArguments ->
+            self.work1()
             self.work2()
         }
     }
 
     @Transactional
     fun work1() {
-        if (memberService!!.count() > 0) {
+        if (memberService.count() > 0) {
             return
         }
 
-        val system = memberService.join("system", "system", "시스템")
-        system.updateApiKey("system")
-        val admin = memberService.join("admin", "admin", "운영자")
-        admin.updateApiKey("admin")
-        val user1 = memberService.join("user1", "1234", "유저1")
-        user1.updateApiKey("user1")
-        val user2 = memberService.join("user2", "1234", "유저2")
-        user2.updateApiKey("user2")
-        val user3 = memberService.join("user3", "1234", "유저3")
-        user3.updateApiKey("user3")
+        listOf(
+            Triple("system", "system", "시스템"),
+            Triple("admin", "admin", "운영자"),
+            Triple("user1", "1234", "유저1"),
+            Triple("user2", "1234", "유저2"),
+            Triple("user3", "1234", "유저3")
+        ).forEach { (username, password, nickname) ->
+            memberService.join(username, password, nickname).apply {
+                updateApiKey(username)
+            }
+        }
     }
 
     @Transactional
     fun work2() {
-        if (postService!!.count() > 0) {
+        if (postService.count() > 0) {
             return
         }
 
-        val member1 = memberService!!.findByUsername("user1").get()
+        val member1 = memberService.findByUsername("user1").get()
         val member2 = memberService.findByUsername("user2").get()
         val member3 = memberService.findByUsername("user3").get()
 
