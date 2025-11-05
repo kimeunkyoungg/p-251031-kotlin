@@ -3,7 +3,6 @@ package com.back.global.initData
 import com.back.domain.member.member.service.MemberService
 import com.back.domain.post.post.service.PostService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,11 +20,9 @@ class BaseInitData(
 
 
     @Bean
-    fun initDataRunner(): ApplicationRunner {
-        return ApplicationRunner { args: ApplicationArguments ->
-            self.work1()
-            self.work2()
-        }
+    fun initDataRunner(): ApplicationRunner = ApplicationRunner {
+        self.work1()
+        self.work2()
     }
 
     @Transactional
